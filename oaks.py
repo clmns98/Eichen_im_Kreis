@@ -1,65 +1,101 @@
 import random as rn
 import numpy as np
 
-# number of oaks
-n = 4
 
-# number of spots
-number_spots = n*(n-1)+1
+def gaussian_sum(n):
+    return (n*(n-1)/2)
 
-print(f"n = {n}\nnumber of spots {number_spots}\n")
+def insert_oaks(circle, spots, n):
 
-# define circle
-circle = np.zeros(number_spots)
-
-def insert_oaks(circle):
     # oaks represented as numbers
     for i in range(1, n+1):
-        insert_spot(circle, i)
+        insert_spot(circle, i, spots)
 
-def insert_spot(circle, i):
+def insert_spot(circle, i, spots):
+
     # generate a random spot
-    spot = rn.randint(1, number_spots-1)
+    spot = rn.randint(0, spots-1)
+
     # check if spot is empty
     if circle[spot] == 0:
+
         # insert an oak into spot
         circle[spot] = i
+
     else:
         # call function again if taken
-        insert_spot(circle, i)
+        insert_spot(circle, i, spots)
 
-def check_circle(circle):
+def get_spaces(circle):
 
-    # counts the distances between oaks
+    # measure the spaces between oaks
     counter = 0
 
-    # distances between oaks
-    dist_list = []
+    # list of spaces between oaks
+    spaces = []
 
-    # set true if first oak found
+    # set true if first oak was found
     first_found = False
 
     for i in circle:
+        # breakpoint()
         if i != 0:
             if first_found:
                 counter += 1
-                dist_list.append(i)
+                spaces.append(counter)
+                counter = 0
             else:
                 first_found = True
                 counter = 0
                 
         else:
             counter += 1
-    
-    return dist_list
 
+    return spaces
+
+def get_distances(spaces, n):
+    # get the distance from every oak to every other oak
+
+    distances = np.zeros(int(gaussian_sum(n)), dtype=int)
+
+    counter = 0
+    
+    for i in range(len(spaces)):
+        for j in range(i + 1, len(spaces) + 1):
+            distances[counter] = sum(spaces[i:j])
+            counter += 1
+    
+    return distances
+
+def check_circle(circle, n):
+
+    # get the spaces between the oaks
+    distances = np.sort(get_distances(get_spaces(circle), n))
+
+    if np.all(np.unique(distances) == distances):
+        return True
+    else:
+        return False
+    
 
 def main():
-    for i in range(9):
-        circle = np.zeros(number_spots)
-        insert_oaks(circle)
-        print(circle)
-        print(check_circle(circle))
-        print()
+    # number of oaks
+    n = 4
 
+    # number of spots
+    spots = n*(n-1)+1
+
+    print(f"\nn = {n}\nnumber of spots {spots}")
+
+    # define circle
+    circle = np.zeros(spots, dtype=int)
+
+    for i in range(100):
+        circle = np.zeros(spots)
+        insert_oaks(circle, spots, n)
+        if check_circle(circle, n):
+            break
+    print(circle)
+    print()
+  
 main()
