@@ -1,6 +1,7 @@
 import random as rn
 import numpy as np
 
+# https://followthescore.org/schueler-labor/eichen-im-kreis/
 
 def gaussian_sum(n):
     return (n*(n-1)/2)
