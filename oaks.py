@@ -7,11 +7,16 @@ import time
 def gaussian_sum_formula(n):
     return int((n*(n-1)/2))
 
-def insert_oaks(circle, spots, n):
+def generate_circle(spots, n):
+    
+    # define circle
+    circle = np.zeros(spots, dtype=int)
 
     # oaks represented as numbers
     for i in range(1, n+1):
         insert_spot(circle, i, spots)
+
+    return circle
 
 def insert_spot(circle, i, spots):
 
@@ -28,13 +33,24 @@ def insert_spot(circle, i, spots):
         # call function again if taken
         insert_spot(circle, i, spots)
 
-def get_spaces(circle):
+def get_outer_dist(spaces,n):
+    
+    sum = 0
+    
+    for i in range(n-1):
+        sum += spaces[i]
 
-    # measure the spaces between oaks
+    return sum
+
+def get_spaces(circle, n):
+
+    # count steps between oaks
+    steps = 0
+
     counter = 0
 
     # list of spaces between oaks
-    spaces = []
+    spaces = np.zeros(n, dtype=int)
 
     # set true if first oak was found
     first_found = False
@@ -43,15 +59,18 @@ def get_spaces(circle):
         # breakpoint()
         if i != 0:
             if first_found:
+                steps += 1
+                spaces[counter] = steps
                 counter += 1
-                spaces.append(counter)
-                counter = 0
+                steps = 0
             else:
                 first_found = True
-                counter = 0
+                steps = 0
                 
         else:
-            counter += 1
+            steps += 1
+
+    spaces[-1] = get_outer_dist(spaces, n)
 
     return spaces
 
@@ -73,20 +92,19 @@ def get_distances(spaces, n):
     for i in range(gaussian_sum, gaussian_sum*2):
         distances[i] = distances[i - gaussian_sum]
 
-
-
     return distances
 
 def check_circle(circle, n):
 
     # get the spaces between the oaks
-    distances = np.sort(get_distances(get_spaces(circle), n))
+    distances = get_distances(get_spaces(circle, n), n)
+    #print(distances)
 
+    # this part needs rework!!!
     if np.all(np.unique(distances) == distances):
         return True
     else:
         return False
-    
 
 def main():
     start_time = time.time()
@@ -99,16 +117,24 @@ def main():
 
     print(f"\nn = {n}\nnumber of spots {spots}")
 
-    # define circle
-    circle = np.zeros(spots, dtype=int)
+    not_found = True
 
-    for i in range(100):
-        circle = np.zeros(spots)
-        insert_oaks(circle, spots, n)
+    #for i in range(400):
+    while not_found:
+
+        # put oaks into circle
+        circle = generate_circle(spots, n)
+        #print(circle)
+
+        # checks if all trees have different distances
         if check_circle(circle, n):
-            break
-    print(circle)
-    print(f"\ntime needed: {time.time()-start_time:.4f}s\n")
+
+            # print the correct circle
+            print(circle)
+
+            # end search for circle
+            not_found = False
     
-  
+    print(f"\ntime needed: {time.time()-start_time:.4f}s\n")
+
 main()
