@@ -103,7 +103,7 @@ def main():
     start_time = time.time()
 
     # number of oaks
-    n = 4
+    n = int(input("enter the number of oaks: "))
 
     # number of spots
     spots = get_spots(n)
