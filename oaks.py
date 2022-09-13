@@ -4,8 +4,8 @@ import time
 
 # https://followthescore.org/schueler-labor/eichen-im-kreis/
 
-def gaussian_sum_formula(n):
-    return int((n*(n-1)/2))
+def get_spots(n):
+    return n*(n-1)+1
 
 def generate_circle(spots, n):
     
@@ -33,15 +33,6 @@ def insert_spot(circle, i, spots):
         # call function again if taken
         insert_spot(circle, i, spots)
 
-def get_outer_dist(spaces,n):
-    
-    sum = 0
-    
-    for i in range(n-1):
-        sum += spaces[i]
-
-    return sum
-
 def get_spaces(circle, n):
 
     # count steps between oaks
@@ -50,7 +41,7 @@ def get_spaces(circle, n):
     counter = 0
 
     # list of spaces between oaks
-    spaces = np.zeros(n, dtype=int)
+    spaces = np.zeros(n-1, dtype=int)
 
     # set true if first oak was found
     first_found = False
@@ -70,16 +61,18 @@ def get_spaces(circle, n):
         else:
             steps += 1
 
-    spaces[-1] = get_outer_dist(spaces, n)
-
     return spaces
 
-def get_distances(spaces, n):
+def get_distances(spaces, n, spots):
     # get the distance from every oak to every other oak
 
-    gaussian_sum = gaussian_sum_formula(n)
+    #gaussian_sum = gaussian_sum_formula(n)
 
-    distances = np.zeros(gaussian_sum*2, dtype=int)
+    # amount of distances
+    dists = int(spots - 1)
+    half_dists = int(dists/2)
+
+    distances = np.zeros(spots-1, dtype=int)
 
     counter = 0
     
@@ -89,19 +82,19 @@ def get_distances(spaces, n):
             counter += 1
     
     # calculate distances the other way around
-    for i in range(gaussian_sum, gaussian_sum*2):
-        distances[i] = distances[i - gaussian_sum]
+    for i in range(half_dists):
+        distances[i + half_dists] = spots - distances[i]
 
     return distances
 
-def check_circle(circle, n):
+def check_circle(circle, n, spots):
 
     # get the spaces between the oaks
-    distances = get_distances(get_spaces(circle, n), n)
+    distances = get_distances(get_spaces(circle, n), n, spots)
     #print(distances)
 
     # this part needs rework!!!
-    if np.all(np.unique(distances) == distances):
+    if np.all(np.unique(distances) == np.sort(distances)):
         return True
     else:
         return False
@@ -113,7 +106,7 @@ def main():
     n = 4
 
     # number of spots
-    spots = n*(n-1)+1
+    spots = get_spots(n)
 
     print(f"\nn = {n}\nnumber of spots {spots}")
 
@@ -127,7 +120,7 @@ def main():
         #print(circle)
 
         # checks if all trees have different distances
-        if check_circle(circle, n):
+        if check_circle(circle, n, spots):
 
             # print the correct circle
             print(circle)
