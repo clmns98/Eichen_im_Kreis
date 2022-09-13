@@ -1,10 +1,11 @@
 import random as rn
 import numpy as np
+import time
 
 # https://followthescore.org/schueler-labor/eichen-im-kreis/
 
-def gaussian_sum(n):
-    return (n*(n-1)/2)
+def gaussian_sum_formula(n):
+    return int((n*(n-1)/2))
 
 def insert_oaks(circle, spots, n):
 
@@ -57,7 +58,9 @@ def get_spaces(circle):
 def get_distances(spaces, n):
     # get the distance from every oak to every other oak
 
-    distances = np.zeros(int(gaussian_sum(n)), dtype=int)
+    gaussian_sum = gaussian_sum_formula(n)
+
+    distances = np.zeros(gaussian_sum*2, dtype=int)
 
     counter = 0
     
@@ -66,6 +69,12 @@ def get_distances(spaces, n):
             distances[counter] = sum(spaces[i:j])
             counter += 1
     
+    # calculate distances the other way around
+    for i in range(gaussian_sum, gaussian_sum*2):
+        distances[i] = distances[i - gaussian_sum]
+
+
+
     return distances
 
 def check_circle(circle, n):
@@ -80,6 +89,8 @@ def check_circle(circle, n):
     
 
 def main():
+    start_time = time.time()
+
     # number of oaks
     n = 4
 
@@ -97,6 +108,7 @@ def main():
         if check_circle(circle, n):
             break
     print(circle)
-    print()
+    print(f"\ntime needed: {time.time()-start_time:.4f}s\n")
+    
   
 main()
