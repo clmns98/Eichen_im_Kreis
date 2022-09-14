@@ -5,6 +5,9 @@ import time
 # https://followthescore.org/schueler-labor/eichen-im-kreis/
 
 def get_spots(n):
+
+    # this is the formula which calculates
+    # how many spots there are in a circle
     return n*(n-1)+1
 
 def generate_circle(spots, n):
@@ -38,6 +41,7 @@ def get_spaces(circle, n):
     # count steps between oaks
     steps = 0
 
+    # this variable is the index for the spaces array
     counter = 0
 
     # list of spaces between oaks
@@ -47,12 +51,18 @@ def get_spaces(circle, n):
     first_found = False
 
     for i in circle:
-        # breakpoint()
+
+        # check if spot is empty
         if i != 0:
+            # check if first oak was already found
             if first_found:
                 steps += 1
+
+                # save the distance to the last oak
                 spaces[counter] = steps
                 counter += 1
+
+                # start counting the distance to the next oak
                 steps = 0
             else:
                 first_found = True
@@ -66,16 +76,17 @@ def get_spaces(circle, n):
 def get_distances(spaces, n, spots):
     # get the distance from every oak to every other oak
 
-    #gaussian_sum = gaussian_sum_formula(n)
-
     # amount of distances
     dists = int(spots - 1)
     half_dists = int(dists/2)
 
+    # array that stores all distances
     distances = np.zeros(spots-1, dtype=int)
 
+    # index for distances array
     counter = 0
     
+    # save every possible distance
     for i in range(len(spaces)):
         for j in range(i + 1, len(spaces) + 1):
             distances[counter] = sum(spaces[i:j])
